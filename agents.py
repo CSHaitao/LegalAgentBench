@@ -36,7 +36,7 @@ def post_request(name, input):
     print("调用工具中...", name, input)
     input = format_input(input)
 
-    response = requests.post(f"{base_url}{name}", headers=headers, json=input)
+    response = requests.post(f"{base_url}/{name}", headers=headers, json=input)
     if response.status_code == 200:
         print("调用成功")
         return response.json()
