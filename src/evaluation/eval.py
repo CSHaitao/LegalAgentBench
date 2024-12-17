@@ -9,32 +9,25 @@ ground_truth = json.load(open('../../data/dataset.json', 'r'))
 
 start = 0
 end = 300
-date = 1205
+date = 0
 mode = "key_answer" # key_answer, key_middle, bertscore
 
 method = ["plan_solve", "plan_execute",'react']
-model_names = ["glm-4", "glm-4-plus", 'llama3.1-instruct', 'qwen-max', 'claude-3-5-sonnet-20241022','gpt-3.5-turbo',  "gpt-4o-mini-2024-07-18",'gpt-4o-2024-08-06']
-
-scores = {
-    
-}
+model_names = ["glm-4", "glm-4-plus", 'llama3.1-instruct', 'qwen-max', 'claude-3-5-sonnet-20241022',
+               'gpt-3.5-turbo',  "gpt-4o-mini-2024-07-18",'gpt-4o-2024-08-06']
 
 for model_name in model_names:
-    scores[model_name] = []
     for p in method:
         test_datas = open(f'../output_{date}/{p}_{date}_{model_name}.json', 'r').readlines()
 
         average_score = 0
 
         if mode == "key_answer":
-
             for idx, data in enumerate(test_datas[start:end]):
-                # print(data)
                 data = json.loads(data)
 
                 res = data['res']
                 key = ground_truth[start + idx]['key']
-                # print(res, key)
                 total = len(key)
 
                 score = 0
@@ -43,7 +36,6 @@ for model_name in model_names:
                     if res.find(k) != -1:
                         score += 1
                 score /= total
-                scores[model_name].append(score)
                 average_score += score
 
             print(format(average_score / len(test_datas[start:end]), ".4f"))

@@ -1,7 +1,5 @@
-import re, string, os
-from typing import List, Union, Literal
+import re
 from enum import Enum
-# import tiktoken
 
 from langchain.prompts import PromptTemplate
 from prompts import *
@@ -45,24 +43,11 @@ def post_request(name, input):
     response = requests.post(f"{base_url}{name}", headers=headers, json=input)
     if response.status_code == 200:
         print("调用成功")
-        ## TODO: 转化为文本
         return response.json()
     else:
         print("调用失败")
-        ## TODO: 返回错误信息 工具调用发生错误, 请检查传入工具的参数是否正确!
-        return response.status_code, response.text
-    
-class ReflexionStrategy(Enum):
-    """
-    NONE: No reflection
-    LAST_ATTEMPT: Use last reasoning trace in context 
-    REFLEXION: Apply reflexion to the next reasoning trace 
-    LAST_ATTEMPT_AND_REFLEXION: Use last reasoning trace in context and apply reflexion to the next reasoning trace 
-    """
-    NONE = 'base'
-    LAST_ATTEMPT = 'last_trial' 
-    REFLEXION = 'reflexion'
-    LAST_ATTEMPT_AND_REFLEXION = 'last_trial_and_reflexion'
+        print(response.status_code, response.text)
+        return "工具调用发生错误, 请检查传入工具的参数是否正确!"
 
 class ReactAgent:
     def __init__(self,
@@ -71,14 +56,12 @@ class ReactAgent:
                  tools: str,
                  tool_names: str,   
                  table_used_prompt: str,      
-                 key: str = "",      # 真实答案              
                  max_steps: int = 10,
                  agent_prompt: PromptTemplate = react_agent_prompt,
                  ) -> None:
         self.model_name = model_name
         self.question = question
-        self.answer = ''                                          # 模型的答案
-        # self.key = key
+        self.answer = ''                                          
         self.key = ''
         self.tools = tools
         self.tool_names = tool_names
@@ -86,8 +69,6 @@ class ReactAgent:
         self.max_steps = max_steps
         self.agent_prompt = agent_prompt
         self.react_examples = REACT_EXAMPLE
-        
-        # self.enc = tiktoken.encoding_for_model("text-davinci-003")
 
         self.__reset_agent()
 
@@ -103,8 +84,7 @@ class ReactAgent:
         self.scratchpad += f'\n思考 {self.step_n}: '
         think = self.prompt_agent()
         print_colored(f"思考 {self.step_n}: {think}", color='red')
-        self.scratchpad += ' ' + think               # here 思考
-        # print(self.scratchpad.split('\n')[-1])
+        self.scratchpad += ' ' + think               
 
         # Act
         self.scratchpad += f'\n行动 {self.step_n}: '
@@ -112,7 +92,6 @@ class ReactAgent:
         print_colored(f"行动 {self.step_n}: {action}", color='blue')
         self.scratchpad += ' ' + action
         action_type, action_input = parse_action(action)
-        # print(self.scratchpad.split('\n')[-1])
 
         print_colored(f"行动在这里: {action_type}: {action_input}", color="green")
 
@@ -126,10 +105,6 @@ class ReactAgent:
         if action_type == 'Final Answer':
             self.scratchpad = '\n'.join(self.scratchpad.split('\n')[:-1]) # 去掉最后拖尾的 观察
             self.answer = action_input
-            # if self.is_correct():
-            #     self.scratchpad += 'Answer is CORRECT'
-            # else: 
-            #     self.scratchpad += 'Answer is INCORRECT'
             self.finished = True
             self.step_n += 1
             return
@@ -154,12 +129,10 @@ class ReactAgent:
         self.step_n += 1
 
     def prompt_agent(self) -> str:
-        # print("prompt is here: ", self._build_agent_prompt())
         return format_step(LLM(self._build_agent_prompt(), self.model_name))
     
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(
-                            # examples = self.react_examples,        # few shot
                             examples = self.react_examples,
                             table_used_prompt = self.table_used_prompt,
                             tools = self.tools,
@@ -174,7 +147,6 @@ class ReactAgent:
         return EM(self.answer, self.key)
 
     def is_halted(self) -> bool:
-        # return ((self.step_n > self.max_steps) or (len(self.enc.encode(self._build_agent_prompt())) > 3896)) and not self.finished
         return (self.step_n > self.max_steps) and not self.finished
 
     def __reset_agent(self) -> None:
@@ -192,13 +164,12 @@ class PSAgent:
                  question: str,
                  tools: str,
                  tool_names: str,   
-                 table_used_prompt: str,      
-                 key: str = "",      # 真实答案              
+                 table_used_prompt: str,                  
                  max_steps: int = 10,
                  ) -> None:
         self.model_name = model_name
         self.question = question
-        self.answer = ''                                          # 模型的答案
+        self.answer = ''                                         
         self.key = ''
         self.tools = tools
         self.tool_names = tool_names
@@ -265,7 +236,7 @@ class PSAgent:
 
     def _build_solve_prompt(self, plan) -> str:
         return self.solve_prompt.format(
-                            examples = PLAN_SOLVE_solve_EXAMPLE,        # few shot
+                            examples = PLAN_SOLVE_solve_EXAMPLE,        
                             table_used_prompt = self.table_used_prompt,
                             tools = self.tools,
                             tool_names = self.tool_names,
@@ -384,7 +355,7 @@ class PEAgent:
 
     def _build_solve_prompt(self, plan) -> str:
         return self.solve_prompt.format(
-                            examples = PLAN_SOLVE_solve_EXAMPLE,        # few shot
+                            examples = PLAN_SOLVE_solve_EXAMPLE,        
                             table_used_prompt = self.table_used_prompt,
                             tools = self.tools,
                             tool_names = self.tool_names,
@@ -393,7 +364,7 @@ class PEAgent:
     
     def _build_replan_prompt(self, plan) -> str:
         return self.replan_prompt.format(
-                            examples = PLAN_SOLVE_replan_EXAMPLE,        # few shot
+                            examples = PLAN_SOLVE_replan_EXAMPLE,        
                             table_used_prompt = self.table_used_prompt,
                             tools = self.tools,
                             plan = plan,              # 问题
@@ -418,74 +389,6 @@ class PEAgent:
         self.question = question
         self.key = key
 
-class ReactReflectAgent(ReactAgent):
-    def __init__(self,
-                 question: str,
-                 model_name: str,
-                 tools: str,
-                 tool_names: str,
-                 table_used_prompt: str,
-                 key: str="",
-                 max_steps: int = 10,
-                 agent_prompt: PromptTemplate = react_reflect_agent_prompt,  # 重定义！ 
-                 reflect_prompt: PromptTemplate = reflect_prompt,            # 重定义！
-                 ) -> None:
-        
-        super().__init__(model_name, question, tools, tool_names, table_used_prompt, agent_prompt=agent_prompt) # 重要！让 react 有 reflexion
-        self.reflect_prompt = reflect_prompt
-        self.reflect_examples = REFLECTIONS         # 重定义！
-        self.reflections: List[str] = []
-        self.reflections_str: str = ''
-        self.model_name = model_name
-
-    def run(self, reset = True, reflect_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> None:
-        if (self.is_finished() or self.is_halted()):
-            self.reflect(reflect_strategy)
-
-        ReactAgent.run(self, reset)
-    
-    def reflect(self,
-                strategy: ReflexionStrategy) -> None:
-        print('Reflecting...')
-        if strategy == ReflexionStrategy.LAST_ATTEMPT:
-            # 仅路径：最后一次尝试 trail
-            self.reflections = [self.scratchpad]
-            self.reflections_str = format_last_attempt(self.question, self.reflections[0])
-        elif strategy == ReflexionStrategy.REFLEXION: 
-            # 反思：所有尝试 trail 的 reflexion
-            self.reflections += [self.prompt_reflection()]
-            self.reflections_str = format_reflections(self.reflections)
-        elif strategy == ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION: 
-            # 路径 + 反思。最后一次尝试的 trail 加上 反思最后一次 trail
-            self.reflections_str = format_last_attempt(self.question, self.scratchpad)
-            self.reflections = [self.prompt_reflection()]
-            self.reflections_str += format_reflections(self.reflections, header = REFLECTION_AFTER_LAST_TRIAL_HEADER)
-        else:
-            raise NotImplementedError(f'Unknown reflection strategy: {strategy}')
-        print(self.reflections_str)
-    
-    def prompt_reflection(self) -> str:
-        # 根据 question,scratchpad 反思 reflecion
-        return format_step(LLM(self._build_reflection_prompt(), model_name=self.model_name))
-
-
-    def _build_reflection_prompt(self) -> str:
-        return self.reflect_prompt.format(
-                            examples = self.reflect_examples,
-                            question = self.question,
-                            scratchpad = self.scratchpad)
- 
-    def _build_agent_prompt(self) -> str:
-        return self.agent_prompt.format(
-                             examples = self.react_examples,
-                            question = self.question,
-                            scratchpad = self.scratchpad,
-                            reflexions = self.reflections, 
-                            table_used_prompt = self.table_used_prompt, 
-                            tools = self.tools,
-                            tool_names = self.tool_names)
-   
-
 import json
 
 def parse_plan(rsp: str):
@@ -502,15 +405,12 @@ def parse_plan(rsp: str):
             step += 1
 
 def parse_action(rsp: str):
-    # json_pattern = r'\[.*?\{.*?\}.*?\]'
     json_pattern = r"```json(.*?)```"
     rsp_json = None
     matches = re.findall(json_pattern, rsp, re.DOTALL)
     if len(matches) != 0:
         for match in matches:
             try:
-                # 加载外层的 JSON 列表
-                # print(match)
                 match = match.replace('\'', '\"').replace('(', '（').replace(')', '）')     
                 rsp_json = json.loads(match)    
                 if isinstance(rsp_json['action_input'], dict):
@@ -533,54 +433,10 @@ def parse_action(rsp: str):
             suffix = ")"
             if tool_call.startswith(prefix) and tool_call.endswith(suffix):
                 tool_call = tool_call[len(prefix):-len(suffix)]
-            tool_call_dict = eval(f"dict({tool_call})")  # 使用 eval 将字符串字典化
+            tool_call_dict = eval(f"dict({tool_call})")
             return action, tool_call_dict
         except Exception as e:
             return "", ""
 
 def format_step(step: str) -> str:
     return step.strip('\n').strip().replace('\n', '')
-
-def format_reflections(reflections: List[str],
-                        header: str = REFLECTION_HEADER) -> str:
-    if reflections == []:
-        return ''
-    else:
-        return header + '反思:\n- ' + '\n- '.join([r.strip() for r in reflections])
-
-def format_last_attempt(question: str,
-                        scratchpad: str,
-                        header: str = LAST_TRIAL_HEADER):
-    return header + f'问题: {question}\n' + scratchpad.strip('\n').strip() + '\n(之前的试验结束)\n'
-
-# def truncate_scratchpad(scratchpad: str, n_tokens: int = 1600, tokenizer = gpt2_enc) -> str:
-#     lines = scratchpad.split('\n')
-#     observations = filter(lambda x: x.startswith('Observation'), lines)
-#     observations_by_tokens = sorted(observations, key=lambda x: len(tokenizer.encode(x)))
-#     while len(gpt2_enc.encode('\n'.join(lines))) > n_tokens:
-#         largest_observation = observations_by_tokens.pop(-1)
-#         ind = lines.index(largest_observation)
-#         lines[ind] = largest_observation.split(':')[0] + ': [truncated wikipedia excerpt]'
-#     return '\n'.join(lines)
-
-def normalize_answer(s):
-  def remove_articles(text):
-    return re.sub(r"\b(a|an|the)\b", " ", text)
-  
-  def white_space_fix(text):
-      return " ".join(text.split())
-
-  def remove_punc(text):
-      exclude = set(string.punctuation)
-      return "".join(ch for ch in text if ch not in exclude)
-
-  def lower(text):
-      return text.lower()
-
-  return white_space_fix(remove_articles(remove_punc(lower(s))))
-
-def EM(answer, key) -> bool:
-    return normalize_answer(answer) == normalize_answer(key)
-
-
-

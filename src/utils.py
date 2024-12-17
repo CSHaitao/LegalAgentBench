@@ -2,7 +2,6 @@ from zhipuai import ZhipuAI
 import json
 import re
 from openai import OpenAI
-import httpx
 import globals
 
 openai_client = OpenAI(
@@ -16,8 +15,6 @@ qianwen_client = OpenAI(
     api_key="your_api_key",
     base_url="you_base_url"
 )
-
-import random
 
 def LLM(query, model_name):
     if model_name.find("gpt") != -1:

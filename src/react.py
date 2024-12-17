@@ -34,9 +34,6 @@ globals.total_token = 0                                                         
 from utils import *
 import traceback
 
-# # #### Run `n` trials
-
-# # %%
 n = 5
 trial = 0
 
