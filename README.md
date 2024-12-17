@@ -1,13 +1,13 @@
-# LegalAgentBench
-The official repo for our paper: LegalAgentBench: Evaluating LLM Agents in Legal Domainl
-
-
+## 运行
+```python
+pip install -r requirments.txt
+cd src
+python react.py
 ```
-@misc{author2024repository,
-  author = {Haitao Li, Junjie Chen, Jingli Yang, Qingyao Ai, Wei Jia, youfeng Liu, Kai Lin, Yueyue WU, Guozhi Yuan, Yiran HU, Wuyue Wang, Yiqun LIU, Minlie Huang},
-  title = {LegalAgentBench: Evaluating LLM Agents in Legal Domain},
-  year = {2024},
-  url = {https://github.com/CSHaitao/LegalAgentBench},
-  note = {Accessed: 2024-12-13},
-}
-```
+
+- data/dataset.json: 数据集
+- data/law_dataset.xlsx: 数据表格（信息源）
+- src/schcma.py: 表格字段说明
+- src/api.py: 所有工具实现
+- src/generated_tools: 包装api成tools，供大模型使用
+- src/react.py: 程序入口，react实现
