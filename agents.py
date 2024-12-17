@@ -33,10 +33,6 @@ def format_input(name, input):
         return input
 
 def post_request(name, input):
-    headers = {
-        'Content-Type': 'application/json',
-        "Authorization": "Bearer 0F7354720533CAACBA57DCA97F89069CB80C78B9BB769786"
-    }
     print("调用工具中...", name, input)
     input = format_input(input)
 

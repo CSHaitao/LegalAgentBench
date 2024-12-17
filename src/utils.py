@@ -4,6 +4,11 @@ import re
 from openai import OpenAI
 import globals
 
+headers = {
+        'Content-Type': 'application/json',
+        "Authorization": "Bearer your_api_key(chatglm)"
+    }
+
 openai_client = OpenAI(
     base_url="you_base_url",
     api_key="your_api_key")
