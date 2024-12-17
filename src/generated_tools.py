@@ -1,6 +1,5 @@
 class Tool():
-    def __init__(self, func, name, description):
-        self.func = func
+    def __init__(self, name, description):
         self.name = name
         self.description = description
 

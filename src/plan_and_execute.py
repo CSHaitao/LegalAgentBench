@@ -46,10 +46,10 @@ for idx, data in enumerate(datas[0:300]):
         # 求和工具
         used_tools.append(get_sum_tool)
         used_tools.append(get_rank_tool)
-        if idx >= 280:
-            used_tools.append(legal_article_retriever_tool)
-            used_tools.append(legal_case_retriever_tool)
-            used_tools.append(legal_knowledge_retriever_tool)
+  
+        used_tools.append(legal_article_retriever_tool)
+        used_tools.append(legal_case_retriever_tool)
+        used_tools.append(legal_knowledge_retriever_tool)
 
         tools = "\n\n".join([f"{tool.name}: {tool.description}" for tool in used_tools])
         tool_names = " ".join([f"{tool.name}" for tool in used_tools])

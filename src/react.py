@@ -2,10 +2,9 @@ import sys, os
 sys.path.append('..')
 root  = '../root/'
 
-from agents import ReactAgent, ReflexionStrategy
+from agents import ReactAgent
 import globals
 
-strategy: ReflexionStrategy = ReflexionStrategy.NONE
 agent_cls = ReactAgent
 
 import json
@@ -38,7 +37,7 @@ n = 5
 trial = 0
 
 
-for idx, data in enumerate(datas[0:300]):
+for idx, data in enumerate(datas[0:1]):
     try:
         globals.this_question_total_token = 0
         globals.this_question_input_token = 0
