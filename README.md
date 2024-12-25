@@ -5,7 +5,7 @@
 
 This repo is for our paper: 
 
-📝[LegalAgentBench: Evaluating LLM Agents in Legal Domain.](xxx)
+📝[LegalAgentBench: Evaluating LLM Agents in Legal Domain.](https://arxiv.org/abs/2412.17259)
 
 With the increasing intelligence and autonomy of LLM agents, their potential applications in the legal domain are becoming increasingly apparent. However, existing general-domain benchmarks cannot fully capture the complexity and subtle nuances of real-world judicial cognition and decision-making. 
 
@@ -15,7 +15,7 @@ LegalAgentBench includes 17 corpora from real-world legal scenarios and provides
 
 # ⚡️ Update
 
-🔥🔥 News: 2024/12/17: We released the first version of the [full paper](xxx).
+🔥🔥 News: 2024/12/23: We released the first version of the [full paper](https://arxiv.org/abs/2412.17259).
 
 ## 🧩 Characteristic
 
@@ -64,5 +64,13 @@ python react.py --model LLM_name --date time
 
 If you find our work useful, please do not save your star and cite our work:
 ```
-[cite here]
+@misc{li2024legalagentbenchevaluatingllmagents,
+      title={LegalAgentBench: Evaluating LLM Agents in Legal Domain}, 
+      author={Haitao Li and Junjie Chen and Jingli Yang and Qingyao Ai and Wei Jia and Youfeng Liu and Kai Lin and Yueyue Wu and Guozhi Yuan and Yiran Hu and Wuyue Wang and Yiqun Liu and Minlie Huang},
+      year={2024},
+      eprint={2412.17259},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2412.17259}, 
+}
 ```
