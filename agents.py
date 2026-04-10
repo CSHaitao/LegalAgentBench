@@ -8,7 +8,7 @@ import requests
 import json
 from src.utils import *
 
-base_url = "https://comm.chatglm.cn/law_api"
+base_url = "http://47.114.81.51:48000/law_api"
 from src.generated_tools import *
 
 def format_input(name, input):
