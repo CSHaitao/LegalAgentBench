@@ -34,7 +34,7 @@ def format_input(name, input):
 
 def post_request(name, input):
     print("调用工具中...", name, input)
-    input = format_input(input)
+    input = format_input(name, input)
 
     response = requests.post(f"{base_url}/{name}", headers=headers, json=input)
     if response.status_code == 200:
